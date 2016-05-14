@@ -142,8 +142,8 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
     private final Map<String, String> fullNames = new HashMap<>();
     @Nonnull
     private final List<String> importPaths = new LinkedList<>();
-    @Nonnull
-    private final ClassNode classAst = new ClassNode();
+    
+    private ClassNode classAst;
     private MethodNode method;
     private final HashMap<MethodNode,StatContext> methodBodys = new HashMap<>();
 
@@ -261,7 +261,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
     public AstBuilder(@Nonnull CompilationUnit compilationUnit, @Nonnull KalangParser parser) {
         this.compilationUnit = compilationUnit;
         this.className = compilationUnit.getSource().getClassName();
-        classAst.name = className;
+        classAst = new ClassNode(0, className, null, null, false, false);
         this.classPath = "";
         this.parser = parser;
         tokenStream = parser.getTokenStream();
@@ -397,7 +397,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public MultiStmtExpr visitMap(KalangParser.MapContext ctx) {
-        MultiStmtExpr mse = MultiStmtExpr.create();
+        List<Statement> stats = new LinkedList();
         LocalVarNode vo = new LocalVarNode();
         VarDeclStmt vds = new VarDeclStmt(vo);
         vo.type = Types.MAP_IMPL_CLASS_TYPE;
@@ -408,7 +408,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             throw new RuntimeException(ex);
         }
         vo.initExpr = newExpr;
-        mse.stmts.add(vds);
+        stats.add(vds);
         VarExpr ve = new VarExpr(vo);
         List<TerminalNode> ids = ctx.Identifier();
         for (int i = 0; i < ids.size(); i++) {
@@ -423,9 +423,9 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
                 throw new RuntimeException(ex);
             }
             ExprStmt es = new ExprStmt(iv);
-            mse.stmts.add(es);
+            stats.add(es);
         }
-        mse.reference = ve;
+        MultiStmtExpr mse =new MultiStmtExpr(stats.toArray(new Statement[stats.size()]),ve);
         mapAst(mse,ctx);
         //TODO set generic toType
         return mse;
@@ -433,7 +433,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public MultiStmtExpr visitListOrArray(KalangParser.ListOrArrayContext ctx) {
-        MultiStmtExpr mse = MultiStmtExpr.create();
+        List<Statement> stmts = new LinkedList<>();
         LocalVarNode vo = new LocalVarNode();
         VarDeclStmt vds = new VarDeclStmt(vo);
         vo.type = Types.LIST_IMPL_CLASS_TYPE;
@@ -444,7 +444,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             throw new RuntimeException(ex);
         }
         vo.initExpr = newExpr;
-        mse.stmts.add(vds);
+        stmts.add(vds);
         VarExpr ve = new VarExpr(vo);
         for (ExpressionContext e : ctx.expression()) {
             InvocationExpr iv;
@@ -453,9 +453,9 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             } catch (MethodNotFoundException|AmbiguousMethodException ex) {
                 throw new RuntimeException(ex);
             }
-            mse.stmts.add(new ExprStmt(iv));
+            stmts.add(new ExprStmt(iv));
         }
-        mse.reference = ve;
+        MultiStmtExpr mse = new MultiStmtExpr(stmts.toArray(new Statement[stmts.size()]), ve);
         //TODO set generic toType
         mapAst(mse,ctx);
         return mse;
@@ -472,17 +472,18 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public AstNode visitExprQuestion(KalangParser.ExprQuestionContext ctx) {
-        MultiStmtExpr mse = MultiStmtExpr.create();
+        List<Statement> stmts = new LinkedList<>();
         LocalVarNode vo = new LocalVarNode();
         VarDeclStmt vds = new VarDeclStmt(vo);
-        mse.stmts.add(vds);
+        stmts.add(vds);
         VarExpr ve = new VarExpr(vo);
-        IfStmt is = new IfStmt();
-        is.setConditionExpr((ExprNode) visit(ctx.expression(0)));
+        
+        ExprNode conditionExpr = (ExprNode) visit(ctx.expression(0));
         ExprNode trueExpr = (ExprNode) visit(ctx.expression(1));
         ExprNode falseExpr = (ExprNode)  visit(ctx.expression(2));
-        is.setTrueBody(new ExprStmt(new AssignExpr(ve, trueExpr)));
-        is.setFalseBody(new ExprStmt(new AssignExpr(ve,falseExpr)));
+        IfStmt is = new IfStmt(conditionExpr
+                ,new ExprStmt(new AssignExpr(ve, trueExpr))
+                ,new ExprStmt(new AssignExpr(ve,falseExpr)));
         Type trueType = trueExpr.getType();
         Type falseType  = falseExpr.getType();
         if(trueType.equals(falseType)){
@@ -491,8 +492,8 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             //TODO get common type
             vo.type = Types.ROOT_TYPE;
         }
-        mse.stmts.add(is);
-        mse.reference = ve;
+        stmts.add(is);
+        MultiStmtExpr mse =new MultiStmtExpr(stmts,ve);
         mapAst(ve, ctx);
         return mse;
     }
@@ -514,9 +515,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             cond = be;
         }
         AssignExpr as = new AssignExpr(to, from);
-        IfStmt is = new IfStmt();
-        is.setConditionExpr(cond);
-        is.setTrueBody(new ExprStmt(as));
+        IfStmt is = new IfStmt(cond,new ExprStmt(as),null);
         mapAst(is,ctx);
         return is;
     }
@@ -552,11 +551,9 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public AstNode visitMethodDecl(MethodDeclContext ctx) {
-        method = classAst.createMethodNode();
-        method.annotations.addAll(getAnnotations(ctx.annotation()));
         String name;
         Type type;
-        int mdf = parseModifier(ctx.varModifier());
+        int modifier = parseModifier(ctx.varModifier());
         if (ctx.prefix != null && ctx.prefix.getText().equals("constructor")) {
             type = Types.VOID_TYPE;
             name = "<init>";
@@ -568,16 +565,18 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             }
             name = ctx.name.getText();
         }
-        method.modifier = mdf;
-        method.type = type;
-        method.name = name;
+        ParameterNode[] parameters = null;
         if (ctx.varDecl() != null) {
-            for(VarDeclContext vd:ctx.varDecl()){
-                ParameterNode pn = ParameterNode.create(method);
+            parameters = new ParameterNode[ctx.varDecl().size()];
+            for(int i=0;i<parameters.length;i++){
+                VarDeclContext vd = ctx.varDecl().get(i);
+                ParameterNode pn = new ParameterNode(type, name);
                 varDecl(vd, pn);
-                method.parameters.add(pn);
+                parameters[i] = (pn);
             }
         }
+        method = classAst.createMethodNode(modifier,type,name,parameters,null);
+        method.annotations.addAll(getAnnotations(ctx.annotation()));
         if (ctx.stat() != null) {
             methodBodys.put(method, ctx.stat());
         }
@@ -609,15 +608,16 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public AstNode visitIfStat(IfStatContext ctx) {
-        IfStmt ifStmt = new IfStmt();
         ExprNode expr = visitExpression(ctx.expression());
-        ifStmt.setConditionExpr(expr);
+        Statement trueBody = null;
+        Statement falseBody = null;
         if (ctx.trueStmt != null) {
-            ifStmt.setTrueBody(visitStat(ctx.trueStmt));
+            trueBody = (visitStat(ctx.trueStmt));
         }
         if (ctx.falseStmt != null) {
-            ifStmt.setFalseBody(visitStat(ctx.falseStmt));
+            falseBody = (visitStat(ctx.falseStmt));
         }
+        IfStmt ifStmt = new IfStmt(expr,trueBody,falseBody);
         mapAst(ifStmt,ctx);
         return ifStmt;
     }
@@ -734,24 +734,27 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public AstNode visitWhileStat(WhileStatContext ctx) {
-        LoopStmt ws = new LoopStmt();
-        ws.preConditionExpr = visitExpression(ctx.expression());
+        
+        ExprNode preConditionExpr = visitExpression(ctx.expression());
+        Statement loopBody = null;
         if (ctx.stat() != null) {
-            ws.loopBody = visitStat(ctx.stat());
+            loopBody = visitStat(ctx.stat());
         }
+        LoopStmt ws = new LoopStmt(null,loopBody, preConditionExpr,null);
         mapAst(ws,ctx);
         return ws;
     }
 
     @Override
     public AstNode visitDoWhileStat(DoWhileStatContext ctx) {
-        LoopStmt ls = new LoopStmt();
+        Statement loopBody = null;
         if (ctx.stat() != null) {
             this.newVarStack();
-            ls.loopBody = visitStat(ctx.stat());
+            loopBody = visitStat(ctx.stat());
             this.popVarStack();
         }
-        ls.postConditionExpr = visitExpression(ctx.expression());
+        ExprNode postConditionExpr = visitExpression(ctx.expression());
+        LoopStmt ls = new LoopStmt(null,loopBody,null,postConditionExpr);
         mapAst(ls,ctx);
         return ls;
     }
@@ -759,11 +762,9 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
     @Override
     public AstNode visitForStat(ForStatContext ctx) {
         this.newVarStack();
-        LoopStmt ls = LoopStmt.create();
         List<LocalVarNode> vars = visitLocalVarDecl(ctx.localVarDecl());
         VarDeclStmt vds = new VarDeclStmt(vars);
-        ls.initStmts.add(vds);
-        ls.preConditionExpr = (ExprNode) visit(ctx.expression());
+        ExprNode preConditionExpr = (ExprNode) visit(ctx.expression());
         BlockStmt bs =new BlockStmt();
         if (ctx.stat() != null) {
             Statement st = visitStat(ctx.stat());
@@ -774,8 +775,8 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
         if(ctx.expressions()!=null){
             bs.statements.addAll(visitExpressions(ctx.expressions()));
         }
-        ls.loopBody = bs;
         this.popVarStack();
+        LoopStmt ls = new LoopStmt(new Statement[]{vds}, bs, preConditionExpr,null);
         mapAst(ls,ctx);
         return ls;
     }
@@ -1129,9 +1130,8 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             return clsRef;
         }
         if (vtb.exist(name)) {
-            VarExpr ve = new VarExpr();
             LocalVarNode declStmt = vtb.get(name); //vars.indexOf(vo);
-            ve.setVar(declStmt);
+            VarExpr ve = new VarExpr(declStmt);
             if(token!=null) mapAst(ve, token);
             return ve;
         } else {
@@ -1291,10 +1291,10 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public AstNode visitTryStat(TryStatContext ctx) {
-        TryStmt tryStmt = new TryStmt();
         this.newVarStack();
-        tryStmt.execStmt = visitStat(ctx.tryStmtList);
+        Statement tryExecStmt = visitStat(ctx.tryStmtList);
         this.popVarStack();
+        List<CatchBlock> catchStatements = new LinkedList<>();
         if (ctx.catchTypes != null) {
             for (int i = 0; i < ctx.catchTypes.size(); i++) {
                 String vName = ctx.catchVarNames.get(i).getText();
@@ -1306,14 +1306,16 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
                 Statement execStmt = visitStat(ctx.catchStmts.get(i));
                 CatchBlock catchStmt = new CatchBlock(vo,execStmt); 
                 this.popVarStack();
-                tryStmt.catchStmts.add(catchStmt);
+                catchStatements.add(catchStmt);
             }
         }
+        Statement finallyStmt = null;
         if (ctx.finalStmtList != null) {
             this.newVarStack();
-            tryStmt.finallyStmt = visitStat(ctx.finalStmtList);
+            finallyStmt = visitStat(ctx.finalStmtList);
             this.popVarStack();
         }
+        TryStmt tryStmt = new TryStmt(tryExecStmt,catchStatements,finallyStmt);
         mapAst(tryStmt,ctx);
         return tryStmt;
     }
@@ -1487,23 +1489,24 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
     @Override
     public Object visitScriptDef(KalangParser.ScriptDefContext ctx) {
         classAst.modifier = Modifier.PUBLIC;
-        classAst.parent = Types.ROOT_TYPE.getClassNode();
+        classAst.superClassNode = Types.ROOT_TYPE.getClassNode();
         List<MethodDeclContext> mds = ctx.methodDecl();
         if(mds!=null){
             for(MethodDeclContext m:mds){
                 visit(m);
             }
         }
-        MethodNode mm = classAst.createMethodNode();
-        mm.name = "main";
-        mm.modifier = Modifier.PUBLIC  + Modifier.STATIC;
-        mm.type = Types.VOID_TYPE;
+        MethodNode mm = classAst.createMethodNode(
+                Modifier.PUBLIC  + Modifier.STATIC
+                ,Types.VOID_TYPE
+                ,"main"
+                ,null
+                ,null
+        );
         //TODO throws exception
-        mm.exceptionTypes = Collections.singletonList(Types.EXCEPTION_CLASS_TYPE);
-        ParameterNode pn = ParameterNode.create(mm);
-        pn.name = "args";
-        pn.type = Types.getArrayType(Types.STRING_CLASS_TYPE);
-        mm.parameters = Collections.singletonList(pn);
+        mm.exceptionTypes.add(Types.EXCEPTION_CLASS_TYPE);
+        ParameterNode pn = new ParameterNode( Types.getArrayType(Types.STRING_CLASS_TYPE), "args");
+        mm.parameters = new ParameterNode[]{pn};
         method = mm;
         List<StatContext> stats = ctx.stat();
         List<Statement> ss = new LinkedList<>();
@@ -1545,9 +1548,9 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
             }
         }
         if (ctx.parentClass != null) {
-            classAst.parent =  requireAst(ctx.parentClass);
+            classAst.superClassNode =  requireAst(ctx.parentClass);
         }else{
-            classAst.parent = Types.ROOT_TYPE.getClassNode();
+            classAst.superClassNode = Types.ROOT_TYPE.getClassNode();
         }
         if (ctx.interfaces != null && ctx.interfaces.size() > 0) {
             for (Token itf : ctx.interfaces) {

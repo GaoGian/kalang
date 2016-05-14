@@ -17,15 +17,12 @@ public class IncrementExpr extends ExprNode{
     
     protected boolean isPrefix = false;
 
-    @Override
-    public List<AstNode> getChildren() {
-        return Collections.singletonList(getExpr());
-    }
 
     public IncrementExpr(AssignableExpr expr,boolean isDesc,boolean isPrefix) {
         this.expr = expr;
         this.isDesc = isDesc;
         this.isPrefix = isPrefix;
+        addChild(expr);
     }
 
     public IncrementExpr(AssignableExpr expr) {
@@ -42,14 +39,6 @@ public class IncrementExpr extends ExprNode{
      */
     public AssignableExpr getExpr() {
         return expr;
-    }
-
-    /**
-     * @param expr the expr to set
-     */
-    public void setExpr(AssignableExpr expr) {
-        Objects.requireNonNull(expr);
-        this.expr = expr;
     }
 
     /**

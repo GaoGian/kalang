@@ -35,7 +35,7 @@ public class Ast2JavaStub extends AstVisitor<Void> implements CodeGenerator{
                 .append(" ");
         boolean isConstructor = "<init>".equals(node.name);
         if(isConstructor){
-            sb.append(AstUtil.getClassNameWithoutPackage(node.classNode.name));
+            sb.append(AstUtil.getClassNameWithoutPackage(((ClassNode)node.getParent()).name));
         }else{
             sb.append("native ")
                 .append(node.type)

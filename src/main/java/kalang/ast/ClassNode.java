@@ -3,6 +3,7 @@
 */
 package kalang.ast;
 import java.util.*;
+import javax.annotation.Nullable;
 import kalang.core.*;
 import kalang.util.AstUtil;
 public class ClassNode extends AstNode implements Annotationable{
@@ -11,7 +12,7 @@ public class ClassNode extends AstNode implements Annotationable{
     
     public String name;
     
-    public ClassNode parent;
+    public ClassNode superClassNode;
     
     public final List<FieldNode> fields = new ArrayList<>();
     
@@ -25,72 +26,29 @@ public class ClassNode extends AstNode implements Annotationable{
     
     public final List<AnnotationNode> annotations = new LinkedList<>();
     
-    public ClassNode(){
-        
-            if(methods == null) methods = new LinkedList();
-        
+    public ClassNode(Integer modifier,String name,@Nullable ClassNode superClassNode,@Nullable List<ClassNode> interfaces,boolean isInterface,boolean isArray){
+            methods = new LinkedList();
             if(interfaces == null) interfaces = new LinkedList();
-        
-    }
-    
-    
-    public ClassNode(Integer modifier,String name,ClassNode parent,List<MethodNode> methods,List<ClassNode> interfaces,boolean isInterface,boolean isArray){
-        
-        
-            if(methods == null) methods = new LinkedList();
-        
-            if(interfaces == null) interfaces = new LinkedList();
-        
-        
             this.modifier = modifier;
-        
             this.name = name;
-        
-            this.parent = parent;
-        
-            //this.fields = fields;
-        
-            this.methods = methods;
-        
+            this.superClassNode = superClassNode;
             this.interfaces = interfaces;
-        
             this.isInterface = isInterface;
-        
             this.isArray = isArray;
-        
     }
     
-    
-    public static ClassNode create(){
-        ClassNode node = new ClassNode();
-        
-        node.methods = new LinkedList();
-        
-        node.interfaces = new LinkedList();
-        
-        return node;
-    }
-    
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        
-        addChild(ls,fields);
-        
-        addChild(ls,methods);
-        
-        return ls;
-    }
-
 
     public FieldNode createField(){
         FieldNode fieldNode = FieldNode.create(this);
         fields.add(fieldNode);
+        addChild(fieldNode);
         return fieldNode;
     }
     
-    public MethodNode createMethodNode(){
-        MethodNode md = MethodNode.create(this);
+    public MethodNode createMethodNode(int modifier,Type type,String name,@Nullable ParameterNode[] parameters,@Nullable Type[] exceptionTypes){
+        MethodNode md = new MethodNode(modifier, type, name,parameters,exceptionTypes);
         methods.add(md);
+        addChild(md);
         return md;
     }
     
@@ -100,8 +58,8 @@ public class ClassNode extends AstNode implements Annotationable{
     
     public MethodNode[] getMethods(){
         Map<String,MethodNode> mds = new HashMap<>();
-        if(parent!=null){
-            MethodNode[] parentMds = parent.getMethods();
+        if(superClassNode!=null){
+            MethodNode[] parentMds = superClassNode.getMethods();
             for(MethodNode m:parentMds){
                 String descriptor = AstUtil.getMethodDescriptor(m);
                 mds.put(descriptor, m);
@@ -116,9 +74,9 @@ public class ClassNode extends AstNode implements Annotationable{
     }
     
     public boolean isSubclassOf(ClassNode clazz){
-        if(parent!=null){
-            if(parent.equals(clazz)) return true;
-            if(parent.isSubclassOf(clazz)) return true;
+        if(superClassNode!=null){
+            if(superClassNode.equals(clazz)) return true;
+            if(superClassNode.isSubclassOf(clazz)) return true;
         }
         if(interfaces!=null){
             for(ClassNode itf:interfaces){
@@ -132,6 +90,15 @@ public class ClassNode extends AstNode implements Annotationable{
     @Override
     public AnnotationNode[] getAnnotations() {
         return annotations.toArray(new AnnotationNode[0]);
+    }
+
+    @Nullable
+    public ClassNode getSuperClassNode() {
+        return superClassNode;
+    }
+
+    public void setSuperClassNode(@Nullable ClassNode superClassNode) {
+        this.superClassNode = superClassNode;
     }
     
 }

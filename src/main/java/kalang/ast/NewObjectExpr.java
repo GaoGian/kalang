@@ -38,12 +38,6 @@ public class NewObjectExpr extends ExprNode{
         constructor = 
                 ObjectInvokeExpr.create(this, "<init>",args);
     }
-    
-    @Override
-    public List<AstNode> getChildren() {
-        return Collections.EMPTY_LIST;
-        //return Collections.singletonList(constructor);
-    }
 
     @Override
     public Type getType() {

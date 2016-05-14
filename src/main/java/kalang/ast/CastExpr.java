@@ -13,12 +13,7 @@ public class CastExpr extends ExprNode{
     public CastExpr(Type type,ExprNode expr){
             this.toType = type;
             this.expr = expr;
-    }
-    
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, getExpr());
-        return ls;
+            addChild(expr);
     }
     
     @Override
@@ -34,24 +29,10 @@ public class CastExpr extends ExprNode{
     }
 
     /**
-     * @param toType the toType to set
-     */
-    public void setToType(Type toType) {
-        Objects.requireNonNull(toType);
-        this.toType = toType;
-    }
-
-    /**
      * @return the expr
      */
     public ExprNode getExpr() {
         return expr;
     }
 
-    /**
-     * @param expr the expr to set
-     */
-    public void setExpr(ExprNode expr) {
-        this.expr = expr;
-    }
 }

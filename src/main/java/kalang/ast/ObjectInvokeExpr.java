@@ -20,7 +20,7 @@ public class ObjectInvokeExpr extends InvocationExpr{
         ClassNode clazz = targetType.getClassNode();
         MethodSelection ms = applyMethod(clazz, methodName, args);
         MethodNode md = ms.selectedMethod;
-        if(AstUtil.isStatic(md.modifier)){
+        if(AstUtil.isStatic(md.getModifier())){
             throw new MethodNotFoundException(methodName + " is static");
         }
         return new ObjectInvokeExpr(target,ms.selectedMethod ,ms.appliedArguments);
@@ -34,6 +34,8 @@ public class ObjectInvokeExpr extends InvocationExpr{
         super(method, args);
         //TODO check non-static
         this.invokeTarget = invokeTarget;
+        addChild(invokeTarget);
+        addChildren(args);
     }
 
     public ExprNode getInvokeTarget() {
@@ -43,15 +45,5 @@ public class ObjectInvokeExpr extends InvocationExpr{
 //    public ClassNode getSpecialClass() {
 //        return specialClass;
 //    }
-
-    @Override
-    public List<AstNode> getChildren() {
-        List<AstNode> list = new LinkedList();
-        addChild(list, invokeTarget);
-        addChild(list, arguments);
-        return list;
-    }
-    
-    
     
 }

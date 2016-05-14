@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
@@ -93,9 +94,9 @@ public class AstUtil {
         if (mn.parameters == null) {
             return new Type[0];
         }
-        Type[] types = new Type[mn.parameters.size()];
+        Type[] types = new Type[mn.parameters.length];
         for(int i=0;i<types.length;i++){
-            types[i] = mn.parameters.get(i).type;
+            types[i] = mn.parameters[i].type;
         }
         return types;
     }
@@ -116,21 +117,22 @@ public class AstUtil {
     }
     
     public static void createEmptyConstructor(ClassNode clazzNode){
-       ClassNode parent = clazzNode.parent;
+       ClassNode parent = clazzNode.superClassNode;
        MethodNode[] methods = parent.getDeclaredMethodNodes();
        for(MethodNode m:methods){
            if(m.name.equals("<init>")){
-               MethodNode mm = clazzNode.createMethodNode();
-               mm.name = m.name;
-               mm.exceptionTypes = m.exceptionTypes;
-               mm.modifier = m.modifier;
-               mm.parameters = m.parameters;
-               mm.type = m.type;
+               MethodNode mm = clazzNode.createMethodNode(
+                m.modifier,
+                       m.type,
+                       m.name,
+                       m.parameters,
+                       m.getExceptionTypes()
+               );
                BlockStmt body = new BlockStmt();
                mm.body = body;
-               ExprNode[] params = new ExprNode[mm.parameters.size()];
+               ExprNode[] params = new ExprNode[mm.parameters.length];
                for(int i=0;i<params.length;i++){
-                   params[i] = new ParameterExpr(mm.parameters.get(i));
+                   params[i] = new ParameterExpr(mm.parameters[i]);
                }
                body.statements.add(
                        new ExprStmt(
@@ -284,11 +286,10 @@ public class AstUtil {
         String fn = field.name;
         String getterName = "get" + NameUtil.firstCharToUpperCase(fn);
         boolean isStatic = isStatic(field.modifier);
-        MethodNode getter = clazz.createMethodNode();
+        MethodNode getter = clazz.createMethodNode(
+        accessModifier,field.getType(),getterName,null,null
+        );
         getter.offset = field.offset;
-        getter.name = getterName;
-        getter.modifier = accessModifier;
-        getter.type = field.getType();
         BlockStmt body = new BlockStmt();
         FieldExpr fe;
         ClassReference cr = new ClassReference(clazz);
@@ -308,15 +309,15 @@ public class AstUtil {
         String fn = field.name;
         String setterName = "set" + NameUtil.firstCharToUpperCase(fn);
         boolean isStatic = isStatic(field.modifier);
-        MethodNode setter = clazz.createMethodNode();
+        ParameterNode param = new ParameterNode(field.getType(), field.name);
+        MethodNode setter = clazz.createMethodNode(
+                accessModifier
+                ,Types.VOID_TYPE
+                ,setterName
+                ,new ParameterNode[]{param}
+                ,null
+        );
         setter.offset = field.offset;
-        setter.name = setterName;
-        setter.modifier = accessModifier;
-        setter.type = Types.VOID_TYPE;
-        ParameterNode param = ParameterNode.create(setter);
-        param.type = field.getType();
-        param.name = field.name;
-        setter.parameters.add(param);
         BlockStmt body = new BlockStmt();
         FieldExpr fe;
         ExprNode paramVal = new ParameterExpr(param);

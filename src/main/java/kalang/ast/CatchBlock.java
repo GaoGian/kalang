@@ -12,13 +12,8 @@ public class CatchBlock extends AstNode {
     public CatchBlock(LocalVarNode catchVar, Statement execStmt) {
         this.catchVar = catchVar;
         this.execStmt = execStmt;
-    }
-
-    public List<AstNode> getChildren() {
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, catchVar);
-        addChild(ls, execStmt);
-        return ls;
+        addChild(catchVar);
+        addChild(execStmt);
     }
 
 }

@@ -1,4 +1,5 @@
 package kalang.ast;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import javax.annotation.Nullable;
 import kalang.core.*;
@@ -10,57 +11,67 @@ public class MethodNode extends AstNode implements Annotationable{
     
     public String name;
     
-    public List<ParameterNode> parameters;
+    public ParameterNode[] parameters;
     
     public final List<AnnotationNode> annotations = new LinkedList<>();
     
     @Nullable
     public BlockStmt body = null;
     
-    public List<Type> exceptionTypes;
-    
-    public ClassNode classNode;
-    
-    
-    protected MethodNode(ClassNode classNode){
-            this.classNode = classNode;
-            if(parameters == null) parameters = new LinkedList();
-        
-            if(exceptionTypes == null) exceptionTypes = new LinkedList();
-        
+    public final List<Type> exceptionTypes = new LinkedList<>();
+
+    public MethodNode(int modifier, Type type, String name){
+        this(modifier, type, name, null, null);
     }
     
-    
-    protected MethodNode(ClassNode classNode,Integer modifier,Type type,String name,List<ParameterNode> parameters,BlockStmt body,List<Type> exceptionTypes){
-        this.classNode = classNode;
-            if(parameters == null) parameters = new LinkedList();
-            if(exceptionTypes == null) exceptionTypes = new LinkedList();
-            this.modifier = modifier;
-            this.type = type;
-            this.name = name;
-            this.parameters = parameters;
-            this.body = body;
-            this.exceptionTypes = exceptionTypes;
-    }
-    
-    
-    protected static MethodNode create(ClassNode classNode){
-        MethodNode node = new MethodNode(classNode);
-        node.parameters = new LinkedList();
-        node.exceptionTypes = new LinkedList();
-        return node;
-    }
-    
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls,parameters);
-        addChild(ls,body);
-        return ls;
+    public MethodNode(int modifier, Type type, String name,@Nullable ParameterNode[] parameters,@Nullable Type[] exceptionTypes) {
+        this.modifier = modifier;
+        this.type = type;
+        this.name = name;
+        this.parameters = parameters == null? new ParameterNode[0] : parameters;
+        if(exceptionTypes!=null){
+            this.exceptionTypes.addAll(Arrays.asList(exceptionTypes));
+        }
+        addChildren(parameters);
+        if(!Modifier.isAbstract(modifier)){
+            body = new BlockStmt();
+            addChild(body);
+        }
     }
 
     @Override
     public AnnotationNode[] getAnnotations() {
         return annotations.toArray(new AnnotationNode[0]);
+    }
+
+    public int getModifier() {
+        return modifier;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ParameterNode[] getParameters() {
+        return parameters;
+    }
+
+    public Type[] getExceptionTypes() {
+        return exceptionTypes.toArray(new Type[exceptionTypes.size()]);
+    }
+
+    @Nullable
+    public BlockStmt getBody() {
+        return body;
+    }
+    
+    @Deprecated
+    public ClassNode getClassNode(){
+        return (ClassNode) getParent();
     }
     
 }

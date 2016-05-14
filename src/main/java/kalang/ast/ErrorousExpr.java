@@ -16,11 +16,7 @@ public class ErrorousExpr extends ExprNode{
 
     public ErrorousExpr(AstNode... children) {
         this.children = children;
-    }
-
-    @Override
-    public List<AstNode> getChildren() {
-        return Arrays.asList(children);
+        addChildren(children);
     }
 
     @Override

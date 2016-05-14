@@ -21,6 +21,7 @@ import kalang.ast.FieldNode;
 import kalang.ast.ParameterNode;
 import kalang.core.Type;
 import kalang.core.Types;
+import kalang.exception.Exceptions;
 import kalang.util.AstUtil;
 
 /**
@@ -57,15 +58,19 @@ public class JavaAstLoader extends AstLoader {
      */
     @Nonnull
     public ClassNode buildFromClass(@Nonnull Class clz) throws AstNotFoundException {
-        ClassNode cn = ClassNode.create();
-        cn.name = clz.getName();
-        loadedClasses.put(clz.getName(), cn);
+        String  name = clz.getName();
         Class superClass = clz.getSuperclass();
+        ClassNode cn = new ClassNode(clz.getModifiers(), name, null, null, clz.isInterface(), clz.isArray());
+        loadedClasses.put(clz.getName(), cn);
+        ClassNode parent;
         if (superClass != null) {
-            cn.parent = findAst(superClass.getName());
-        } else if (!cn.name.equals(ROOT_CLASS)) {
-            cn.parent = findAst(ROOT_CLASS);
+            parent = findAst(superClass.getName());
+        } else if (!name.equals(ROOT_CLASS)) {
+            parent = findAst(ROOT_CLASS);
+        }else{
+            parent = null;
         }
+        cn.setSuperClassNode(parent);
         Class[] clzInterfaces = clz.getInterfaces();
         if(clzInterfaces != null){
             for(Class itf:clzInterfaces){
@@ -94,26 +99,7 @@ public class JavaAstLoader extends AstLoader {
             }
         }
         for (Executable m : methods) {
-            MethodNode methodNode = cn.createMethodNode();
-            for (Parameter p : m.getParameters()) {
-                ParameterNode param = ParameterNode.create(methodNode);
-                param.name = p.getName();
-                param.type = getType(p.getType());
-                methodNode.parameters.add(param);
-            }
-            if (m instanceof Method) {
-                methodNode.type =getType(((Method) m).getReturnType());
-                methodNode.name = m.getName();
-                methodNode.modifier = m.getModifiers();
-            } else if (m instanceof Constructor) {
-                methodNode.name = "<init>";
-                methodNode.type = Types.VOID_TYPE;// getType(clz);
-                methodNode.modifier = m.getModifiers();// | Modifier.STATIC;
-            }
-            methodNode.body = null;
-            for (Class e : m.getExceptionTypes()) {
-                methodNode.exceptionTypes.add(getType(e));
-            }
+            buildMethodNode(cn, m);
         }
         for (Field f : clz.getFields()) {
             FieldNode fn = cn.createField();
@@ -132,6 +118,29 @@ public class JavaAstLoader extends AstLoader {
         javaClassLoader = this.getClass().getClassLoader();
     }
     
+    private MethodNode buildMethodNode(ClassNode clazz,Executable m) throws AstNotFoundException{
+        Parameter[] parameters = m.getParameters();
+            ParameterNode[] parameterNodes = new ParameterNode[parameters.length];
+            for (int i=0;i<parameters.length;i++) {
+                Parameter p = parameters[i];
+                ParameterNode pn = new ParameterNode(p.getModifiers(),getType(p.getType()),p.getName());
+                parameterNodes[i] = pn;
+            }
+            Type type;
+            String methodName;
+            if (m instanceof Method) {
+                type =getType(((Method) m).getReturnType());
+                methodName = m.getName();
+            } else if (m instanceof Constructor) {
+                methodName = "<init>";
+                type = Types.VOID_TYPE;// getType(clz);
+            }else{
+                throw Exceptions.unsupportedTypeException(m);
+            }
+            Type[] exceptionTypes = getTypes(m.getParameterTypes());
+            MethodNode methodNode = clazz.createMethodNode(m.getModifiers(), type, methodName, parameterNodes, exceptionTypes);
+            return methodNode;
+    }
     
 
     @Override
@@ -165,6 +174,14 @@ public class JavaAstLoader extends AstLoader {
         }else{
             return Types.getClassType(findAst(type.getName()));
         }
+    }
+
+    private Type[] getTypes(Class<?>[] parameterTypes) throws AstNotFoundException {
+        Type[] types = new Type[parameterTypes.length];
+        for(int i=0;i<parameterTypes.length;i++){
+            types[i] = getType(parameterTypes[i]);
+        }
+        return types;
     }
 
 }

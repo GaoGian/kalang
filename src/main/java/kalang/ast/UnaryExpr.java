@@ -18,13 +18,7 @@ public class UnaryExpr extends ExprNode{
     public UnaryExpr(ExprNode expr,String operation){
             this.expr = expr;
             this.operation = operation;
-    }
-    
-    @Override
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, getExpr());
-        return ls;
+            addChild(expr);
     }
 
     @Override
@@ -40,14 +34,6 @@ public class UnaryExpr extends ExprNode{
      */
     public ExprNode getExpr() {
         return expr;
-    }
-
-    /**
-     * @param expr the expr to set
-     */
-    public void setExpr(ExprNode expr) {
-        Objects.requireNonNull(expr);
-        this.expr = expr;
     }
 
     /**

@@ -18,7 +18,7 @@ public class StaticInvokeExpr extends InvocationExpr{
     public static StaticInvokeExpr create(ClassReference clazz, String methodName, ExprNode[] args) throws MethodNotFoundException, AmbiguousMethodException {
         MethodSelection ms = applyMethod(clazz.getReferencedClassNode() , methodName, args);
         MethodNode md = ms.selectedMethod;
-        if(!AstUtil.isStatic(md.modifier)){
+        if(!AstUtil.isStatic(md.getModifier())){
             throw new MethodNotFoundException(methodName + " is not static");
         }
         return new StaticInvokeExpr(clazz, md , ms.appliedArguments);
@@ -26,24 +26,16 @@ public class StaticInvokeExpr extends InvocationExpr{
 
     public StaticInvokeExpr(ClassReference invokeClass, MethodNode method, ExprNode[] args) {
         super(method, args);
-        if(!AstUtil.isStatic(method.modifier)){
+        if(!AstUtil.isStatic(method.getModifier())){
             throw new IllegalArgumentException("static method is required");
         }
         this.invokeClass = invokeClass;
+        addChild(invokeClass);
+        addChildren(args);
     }
 
     public ClassReference getInvokeClass() {
         return invokeClass;
     }
-
-    @Override
-    public List<AstNode> getChildren() {
-        ArrayList<AstNode> list = new ArrayList();
-        addChild(list, invokeClass);
-        addChild(list, arguments);
-        return list;
-    }
-    
-    
     
 }

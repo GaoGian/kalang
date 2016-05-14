@@ -50,13 +50,8 @@ public abstract class BinaryExpr extends ExprNode{
             this.expr1 = expr1;
             this.expr2 = expr2;
             this.operation = operation;
-    }
-    @Override
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, getExpr1());
-        addChild(ls, getExpr2());
-        return ls;
+            addChild(expr1);
+            addChild(expr2);
     }
 
     /**
@@ -66,27 +61,12 @@ public abstract class BinaryExpr extends ExprNode{
         return expr1;
     }
 
-    /**
-     * @param expr1 the expr1 to set
-     */
-    public void setExpr1(ExprNode expr1) {
-        Objects.requireNonNull(expr1);
-        this.expr1 = expr1;
-    }
 
     /**
      * @return the expr2
      */
     public ExprNode getExpr2() {
         return expr2;
-    }
-
-    /**
-     * @param expr2 the expr2 to set
-     */
-    public void setExpr2(ExprNode expr2) {
-        Objects.requireNonNull(expr2);
-        this.expr2 = expr2;
     }
 
     /**
@@ -102,6 +82,20 @@ public abstract class BinaryExpr extends ExprNode{
     public void setOperation(String operation) {
         Objects.requireNonNull(operation);
         this.operation = operation;
+    }
+
+    public void setExpr1(ExprNode expr) {
+        expr1 = expr;
+        clearChild();
+        addChild(expr1);
+        addChild(expr2);
+    }
+
+    public void setExpr2(ExprNode expr) {
+        expr2 = expr;
+        clearChild();
+        addChild(expr1);
+        addChild(expr2);
     }
 
 }

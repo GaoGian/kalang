@@ -22,6 +22,7 @@ public class ObjectFieldExpr extends FieldExpr{
         super(field);
         //TODO check non-static
         this.target = target;
+        addChild(target);
     }
     
     /**
@@ -46,12 +47,5 @@ public class ObjectFieldExpr extends FieldExpr{
         }
         return new ObjectFieldExpr(target,field);
     }
-
-    @Override
-    public List<AstNode> getChildren() {
-        return Collections.singletonList(target);
-    }
-    
-    
 
 }

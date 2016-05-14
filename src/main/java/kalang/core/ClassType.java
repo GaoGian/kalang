@@ -19,7 +19,7 @@ public class ClassType extends Type{
     private ClassNode clazz;
 
     public ClassType(ClassNode clazz) {
-        super(clazz.parent==null?null:Types.getClassType(clazz.parent));
+        super(clazz.superClassNode==null?null:Types.getClassType(clazz.superClassNode));
         this.clazz = clazz;
     }
 

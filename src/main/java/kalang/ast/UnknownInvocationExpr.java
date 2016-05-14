@@ -23,6 +23,8 @@ public class UnknownInvocationExpr extends ExprNode{
         this.target = target;
         this.methodName = methodName;
         this.arguments = arguments;
+        addChild(target);
+        addChildren(arguments);
     }
 
     @Nullable
@@ -42,15 +44,5 @@ public class UnknownInvocationExpr extends ExprNode{
     public Type getType() {
         return Types.ROOT_TYPE;
     }
-
-    @Override
-    public List<AstNode> getChildren() {
-        LinkedList<AstNode> ls = new LinkedList();
-        ls.add(target);
-        ls.addAll(Arrays.asList(arguments));
-        return ls;
-    }
-    
-    
 
 }

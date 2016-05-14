@@ -12,12 +12,9 @@ public class BlockStmt extends Statement{
         
     }
     
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        
-        addChild(ls,statements);
-        
-        return ls;
+    public void addStatement(Statement stmt){
+        addChild(stmt);
+        statements.add(stmt);
     }
     
 }

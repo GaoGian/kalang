@@ -23,7 +23,7 @@ public class SuperExpr extends ExprNode{
         if(classNode.parent==null){
             return null;
         }
-        return Types.getClassType(classNode.parent);
+        return Types.getClassType(classNode.superClassNode);
     }
 
     public ClassNode getClassNode() {

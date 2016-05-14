@@ -16,48 +16,12 @@ public class PrimitiveCastExpr extends ExprNode{
     
     
     public PrimitiveCastExpr(PrimitiveType fromType,PrimitiveType toType,ExprNode expr){
-        
-        
             this.fromType = fromType;
-        
             this.toType = toType;
-        
             this.expr = expr;
-        
-    }
-    
-    
-    public static PrimitiveCastExpr create(){
-        PrimitiveCastExpr node = new PrimitiveCastExpr();
-        
-        return node;
+            addChild(expr);
     }
         
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        
-        addChild(ls, getExpr());
-        
-        return ls;
-    }
-    
-    public String toString(){
-        String str = "PrimitiveCastExpr{\r\n";
-        
-        if(getFromType()!=null){
-            str += "  fromType:" + getFromType().toString()+"\r\n";
-        }
-        
-        if(getToType()!=null){
-            str += "  toType:" + getToType().toString()+"\r\n";
-        }
-        
-        if(getExpr()!=null){
-            str += "  expr:" + getExpr().toString()+"\r\n";
-        }
-        
-        return str+"}";
-    }
 
     @Override
     public Type getType() {
@@ -101,10 +65,4 @@ public class PrimitiveCastExpr extends ExprNode{
         return expr;
     }
 
-    /**
-     * @param expr the expr to set
-     */
-    public void setExpr(ExprNode expr) {
-        this.expr = expr;
-    }
 }

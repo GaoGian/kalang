@@ -174,8 +174,8 @@ public class Ast2Class extends AbstractAstVisitor<Object> implements CodeGenerat
         classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         annotation(classWriter, clazz.getAnnotations());
         String parentName = "java.lang.Object";
-        if(node.parent!=null){
-            parentName = node.parent.name;
+        if(node.superClassNode!=null){
+            parentName = node.superClassNode.name;
         }
         String[] interfaces = null;
         if(node.interfaces!=null){
@@ -210,7 +210,7 @@ public class Ast2Class extends AbstractAstVisitor<Object> implements CodeGenerat
     @Override
     public Object visitMethodNode(MethodNode node) {
         int access = node.modifier;
-        md = classWriter.visitMethod(access, internalName(node.name),getMethodDescriptor(node), null,internalName(node.exceptionTypes.toArray(new Type[0])) );
+        md = classWriter.visitMethod(access, internalName(node.name),getMethodDescriptor(node), null,internalName(node.getExceptionTypes()));
         annotation(md, node.getAnnotations());
         if(AstUtil.isStatic(node.modifier)){
             varIdCounter = 0;
@@ -507,7 +507,7 @@ public class Ast2Class extends AbstractAstVisitor<Object> implements CodeGenerat
     public Object visitBinaryExpr(BinaryExpr node) {
         ExprNode e1 = node.getExpr1();
         ExprNode e2 = node.getExpr2();
-        int op = 0;
+        int op;
         org.objectweb.asm.Type at = asmType(node.getExpr1().getType());
         switch(node.getOperation()){
             case "+": op = IADD;break;

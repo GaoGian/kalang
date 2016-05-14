@@ -22,6 +22,7 @@ public class UnknownFieldExpr extends AssignableExpr{
         this.target = target;
         this.fieldName = fieldName;
         this.specialClass = specialClass;
+        addChild(target);
     }
 
     public AstNode getTarget() {
@@ -35,11 +36,6 @@ public class UnknownFieldExpr extends AssignableExpr{
     @Override
     public Type getType() {
         return Types.ROOT_TYPE;
-    }
-
-    @Override
-    public List<AstNode> getChildren() {
-        return Collections.singletonList(target);
     }
 
     public ClassNode getSpecialClass() {

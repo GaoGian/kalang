@@ -71,7 +71,7 @@ public abstract class InvocationExpr extends ExprNode {
 
     @Nonnull
     public ClassType getInvokeClassType() {
-        return Types.getClassType(method.classNode);
+        return Types.getClassType(method.getClassNode());
     }
 
     @Nullable
@@ -84,7 +84,7 @@ public abstract class InvocationExpr extends ExprNode {
 
     @Override
     public Type getType() {
-        return method.type;
+        return method.getType();
     }
 
     /**

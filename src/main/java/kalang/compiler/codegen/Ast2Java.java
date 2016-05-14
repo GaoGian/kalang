@@ -189,8 +189,8 @@ public class Ast2Java extends AbstractAstVisitor<String> implements CodeGenerato
         }
         String pkgStr = pkg.length()>0 ? "package " + pkg + ";" : "";
         String parentStr = "";
-        if (node.parent != null) {
-            parentStr = "extends " + node.parent.name;
+        if (node.superClassNode != null) {
+            parentStr = "extends " + node.superClassNode.name;
         }
         String impStr = "";
         if (node.interfaces != null && node.interfaces.size() > 0) {
@@ -411,7 +411,7 @@ public class Ast2Java extends AbstractAstVisitor<String> implements CodeGenerato
 
     @Override
     public String visitInvocationExpr(InvocationExpr node) {
-        String invokeTarget = null;
+        String invokeTarget;
         String fullCallName = null;
         String mname = node.getMethod().name;
         if (node instanceof ObjectInvokeExpr) {

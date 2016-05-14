@@ -181,8 +181,7 @@ public abstract class AbstractAstVisitor<T> implements IAstVisitor<T>{
     
     public Map<AstNode,T> visitChildren(AstNode node){
         Map<AstNode,T> result = new HashMap();
-        List<AstNode> children = node.getChildren();
-        for(AstNode c:children){
+        for(AstNode c:node.getChildren()){
             result.put(c,visit(c));
         }
         return result;

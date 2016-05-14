@@ -356,9 +356,9 @@ public class SemanticAnalyzer extends AstVisitor<Type> {
     @Override
     public Type visitTryStmt(TryStmt node) {
         this.exceptionStack.add(new HashMap<>());        
-        visit(node.execStmt);
+        visit(node.getExecStmt());
         boolean tryReturned = this.returned;
-        for(CatchBlock cs:node.catchStmts){
+        for(CatchBlock cs:node.getCatchStmts()){
             this.returned = false;
             visit(cs);
             tryReturned = tryReturned && this.returned;
@@ -368,7 +368,7 @@ public class SemanticAnalyzer extends AstVisitor<Type> {
             this.exceptionStack.peek().putAll(uncaught);
         }
         returned = false;
-        visit(node.finallyStmt);
+        visit(node.getFinallyStmt());
         this.returned = tryReturned || returned;
         return null;
     }
@@ -427,17 +427,17 @@ public class SemanticAnalyzer extends AstVisitor<Type> {
 
     @Override
     public Type visitLoopStmt(LoopStmt node) {
-        if (node.preConditionExpr != null) {
-            requireBoolean(node.preConditionExpr);
+        if (node.getPreConditionExpr() != null) {
+            requireBoolean(node.getPreConditionExpr());
         }
-        if (node.initStmts != null) {
-            visitAll(node.initStmts);
+        if (node.getInitStmts() != null) {
+            visitAll(node.getInitStmts());
         }
-        if (node.loopBody != null) {
-            visit(node.loopBody);
+        if (node.getLoopBody() != null) {
+            visit(node.getLoopBody());
         }
-        if (node.postConditionExpr != null) {
-            requireBoolean(node.postConditionExpr);
+        if (node.getPostConditionExpr() != null) {
+            requireBoolean(node.getPostConditionExpr());
         }
         return null;
     }
@@ -454,8 +454,8 @@ public class SemanticAnalyzer extends AstVisitor<Type> {
         returned = false;
         this.exceptionStack.push(new HashMap<>());
         super.visitMethodNode(node);
-        if (method.exceptionTypes != null) {
-            for (Type e : method.exceptionTypes) {
+        if (method.getExceptionTypes() != null) {
+            for (Type e : method.getExceptionTypes()) {
                 this.caughException(e);
             }
         }

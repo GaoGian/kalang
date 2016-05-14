@@ -75,15 +75,13 @@ public class AstLoader {
 
     //TODO should  createArrayAst be removed?
     public static ClassNode createArrayAst(String component) {
-        ClassNode clazz = ClassNode.create();
+        ClassNode clazz = new ClassNode(Modifier.PUBLIC, component+"[]", null, null,false, true);
         FieldNode field = clazz.createField();
         field.modifier = Modifier.PUBLIC;
         field.type = Types.INT_TYPE;
         field.name = "length";
         field.initExpr = null;
-        clazz.name = component + "[]";
-        clazz.isArray = true;
-        clazz.parent = BASE_AST_LOADER.getAst("java.lang.Object");
+        clazz.setSuperClassNode(BASE_AST_LOADER.getAst("java.lang.Object"));
         return clazz;
     }
 

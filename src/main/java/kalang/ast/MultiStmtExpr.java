@@ -6,62 +6,31 @@ import java.util.*;
 import kalang.core.*;
 public class MultiStmtExpr extends ExprNode{
     
-    public List<Statement> stmts;
+    public Statement[] stmts;
     
     public ExprNode reference;
     
-    
-    public MultiStmtExpr(){
-        
-            if(stmts == null) stmts = new LinkedList();
-        
-    }
-    
-    
-    public MultiStmtExpr(List<Statement> stmts,ExprNode reference){
-        
-            if(stmts == null) stmts = new LinkedList();
-        
-        
+    public MultiStmtExpr(Statement[] stmts,ExprNode reference){
             this.stmts = stmts;
-        
             this.reference = reference;
-        
+            addChildren(stmts);
     }
-    
-    
-    public static MultiStmtExpr create(){
-        MultiStmtExpr node = new MultiStmtExpr();
-        
-        node.stmts = new LinkedList();
-        
-        return node;
-    }
-    
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        
-        addChild(ls,stmts);
-        
-        return ls;
-    }
-    
-    public String toString(){
-        String str = "MultiStmtExpr{\r\n";
-        
-        if(stmts!=null){
-            str += "  stmts:" + stmts.toString()+"\r\n";
-        }
-        
-        if(reference!=null){
-            str += "  reference:" + reference.toString()+"\r\n";
-        }
-        
-        return str+"}";
+
+    public MultiStmtExpr(List<Statement> stmts, VarExpr reference) {
+        this(stmts.toArray(new Statement[stmts.size()]), reference);
     }
 
     @Override
     public Type getType() {
         return getType(reference);
     }
+
+    public Statement[] getStmts() {
+        return stmts;
+    }
+
+    public ExprNode getReference() {
+        return reference;
+    }
+    
 }

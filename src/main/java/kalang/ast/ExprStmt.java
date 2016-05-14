@@ -10,13 +10,7 @@ public class ExprStmt extends Statement{
     
     public ExprStmt(ExprNode expr){
             this.expr = expr;
-    }
-    
-    @Override
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, getExpr());
-        return ls;
+            addChild(expr);
     }
     
     /**
@@ -26,11 +20,4 @@ public class ExprStmt extends Statement{
         return expr;
     }
 
-    /**
-     * @param expr the expr to set
-     */
-    public void setExpr(ExprNode expr) {
-        Objects.requireNonNull(expr);
-        this.expr = expr;
-    }
 }

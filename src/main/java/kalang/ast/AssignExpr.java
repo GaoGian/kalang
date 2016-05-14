@@ -14,17 +14,10 @@ public class AssignExpr extends ExprNode{
     protected ExprNode from;
     
     public AssignExpr(@Nonnull AssignableExpr to,@Nonnull ExprNode from){
-            this.to = to;
-            this.from = from;
-    }
-    
-
-    
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, getTo());
-        addChild(ls, getFrom());
-        return ls;
+        addChild(to);
+        addChild(from);    
+        this.to = to;
+        this.from = from;    
     }
 
     @Override
@@ -44,6 +37,8 @@ public class AssignExpr extends ExprNode{
      */
     public void setTo(AssignableExpr to) {
         Objects.requireNonNull(to);
+        removeChild(this.to);
+        addChild(to);
         this.to = to;
     }
 
@@ -59,6 +54,8 @@ public class AssignExpr extends ExprNode{
      */
     public void setFrom(ExprNode from) {
         Objects.requireNonNull(from);
+        removeChild(this.from);
+        addChild(from);
         this.from = from;
     }
     

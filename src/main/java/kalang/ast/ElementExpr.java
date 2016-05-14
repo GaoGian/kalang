@@ -15,15 +15,10 @@ public class ElementExpr extends AssignableExpr{
     public ElementExpr(ExprNode target,ExprNode key){
             this.arrayExpr = target;
             this.index = key;
+            addChild(arrayExpr);
+            addChild(index);
     }
     
-    @Override
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        addChild(ls, arrayExpr);
-        addChild(ls, index);
-        return ls;
-    }
 
     @Override
     public Type getType() {
@@ -43,26 +38,10 @@ public class ElementExpr extends AssignableExpr{
     }
 
     /**
-     * @param arrayExpr the arrayExpr to set
-     */
-    public void setArrayExpr(ExprNode arrayExpr) {
-        Objects.requireNonNull(arrayExpr);
-        this.arrayExpr = arrayExpr;
-    }
-
-    /**
      * @return the index
      */
     public ExprNode getIndex() {
         return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(ExprNode index) {
-        Objects.requireNonNull(index);
-        this.index = index;
     }
     
 }

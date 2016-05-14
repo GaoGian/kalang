@@ -5,75 +5,34 @@ public class TryStmt extends Statement{
     
     public Statement execStmt;
     
-    public List<CatchBlock> catchStmts;
+    public CatchBlock[] catchStmts;
     
     public Statement finallyStmt;
     
     
-    public TryStmt(){
-        
-            if(catchStmts == null) catchStmts = new LinkedList();
-        
-    }
-    
-    
-    public TryStmt(Statement execStmt,List<CatchBlock> catchStmts,Statement finallyStmt){
-        
-            if(catchStmts == null) catchStmts = new LinkedList();
-        
-        
+    public TryStmt(Statement execStmt,CatchBlock[] catchStmts,Statement finallyStmt){
             this.execStmt = execStmt;
-        
             this.catchStmts = catchStmts;
-        
             this.finallyStmt = finallyStmt;
-        
+            addChild(execStmt);
+            addChildren(catchStmts);
+            addChild(finallyStmt);
+    }
+
+    public TryStmt(Statement tryExecStmt, List<CatchBlock> catchStatements, Statement finallyStmt) {
+        this(tryExecStmt, catchStatements.toArray(new CatchBlock[0]), finallyStmt);
+    }
+
+    public Statement getExecStmt() {
+        return execStmt;
+    }
+
+    public CatchBlock[] getCatchStmts() {
+        return catchStmts;
+    }
+
+    public Statement getFinallyStmt() {
+        return finallyStmt;
     }
     
-    
-    public static TryStmt create(){
-        TryStmt node = new TryStmt();
-        
-        node.catchStmts = new LinkedList();
-        
-        return node;
-    }
-    
-    protected void addChild(List<AstNode> list,List nodes){
-        if(nodes!=null) list.addAll(nodes);
-    }
-    
-    protected void addChild(List<AstNode> list,AstNode node){
-        if(node!=null) list.add(node);
-    }
-    
-    public List<AstNode> getChildren(){
-        List<AstNode> ls = new LinkedList();
-        
-        addChild(ls,execStmt);
-        
-        addChild(ls,catchStmts);
-        
-        addChild(ls,finallyStmt);
-        
-        return ls;
-    }
-    
-    public String toString(){
-        String str = "TryStmt{\r\n";
-        
-        if(execStmt!=null){
-            str += "  execStmt:" + execStmt.toString()+"\r\n";
-        }
-        
-        if(catchStmts!=null){
-            str += "  catchStmts:" + catchStmts.toString()+"\r\n";
-        }
-        
-        if(finallyStmt!=null){
-            str += "  finallyStmt:" + finallyStmt.toString()+"\r\n";
-        }
-        
-        return str+"}";
-    }
 }
