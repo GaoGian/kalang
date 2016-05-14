@@ -551,6 +551,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
 
     @Override
     public AstNode visitMethodDecl(MethodDeclContext ctx) {
+        method = null;
         String name;
         Type type;
         int modifier = parseModifier(ctx.varModifier());
@@ -1103,8 +1104,8 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
     
     private boolean isDefindedId(String id){
         if(isClassId(id)) return true;
-        if(getNodeById(id,null)!=null) return true;
-        return false;
+        AstNode namedNode = getNodeById(id,null);
+        return namedNode!=null;
     }
     
     private boolean isClassId(String name){

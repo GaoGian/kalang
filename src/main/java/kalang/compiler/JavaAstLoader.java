@@ -120,26 +120,26 @@ public class JavaAstLoader extends AstLoader {
     
     private MethodNode buildMethodNode(ClassNode clazz,Executable m) throws AstNotFoundException{
         Parameter[] parameters = m.getParameters();
-            ParameterNode[] parameterNodes = new ParameterNode[parameters.length];
-            for (int i=0;i<parameters.length;i++) {
-                Parameter p = parameters[i];
-                ParameterNode pn = new ParameterNode(p.getModifiers(),getType(p.getType()),p.getName());
-                parameterNodes[i] = pn;
-            }
-            Type type;
-            String methodName;
-            if (m instanceof Method) {
-                type =getType(((Method) m).getReturnType());
-                methodName = m.getName();
-            } else if (m instanceof Constructor) {
-                methodName = "<init>";
-                type = Types.VOID_TYPE;// getType(clz);
-            }else{
-                throw Exceptions.unsupportedTypeException(m);
-            }
-            Type[] exceptionTypes = getTypes(m.getParameterTypes());
-            MethodNode methodNode = clazz.createMethodNode(m.getModifiers(), type, methodName, parameterNodes, exceptionTypes);
-            return methodNode;
+        ParameterNode[] parameterNodes = new ParameterNode[parameters.length];
+        for (int i=0;i<parameters.length;i++) {
+            Parameter p = parameters[i];
+            ParameterNode pn = new ParameterNode(p.getModifiers(),getType(p.getType()),p.getName());
+            parameterNodes[i] = pn;
+        }
+        Type type;
+        String methodName;
+        if (m instanceof Method) {
+            type =getType(((Method) m).getReturnType());
+            methodName = m.getName();
+        } else if (m instanceof Constructor) {
+            methodName = "<init>";
+            type = Types.VOID_TYPE;// getType(clz);
+        }else{
+            throw Exceptions.unsupportedTypeException(m);
+        }
+        Type[] exceptionTypes = getTypes(m.getParameterTypes());
+        MethodNode methodNode = clazz.createMethodNode(m.getModifiers(), type, methodName, parameterNodes, exceptionTypes);
+        return methodNode;
     }
     
 

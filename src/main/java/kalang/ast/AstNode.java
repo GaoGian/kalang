@@ -20,19 +20,22 @@ public abstract class AstNode {
     private final List<AstNode> children = new LinkedList<>();
     
     @Nullable
-    protected AstNode parent;
+    private AstNode parent;
     
     @Nonnull
     public OffsetRange offset = OffsetRange.NONE;
     
-    protected final void addChild(AstNode c){
-        Objects.requireNonNull(c);
-        children.add(c);
-        c.parent = this;
+    protected final void addChild(@Nullable AstNode c){
+        if(c!=null){
+            children.add(c);
+            c.parent = this;
+        }        
     }
     
-    protected final void addChildren(AstNode... children){
-        for(AstNode c:children) addChild(c);
+    protected final void addChildren(@Nullable AstNode... children){
+        if(children!=null){
+            for(AstNode c:children) addChild(c);
+        }
     }
     
     protected void clearChild(){

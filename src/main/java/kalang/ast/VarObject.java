@@ -1,5 +1,6 @@
 package kalang.ast;
 import java.util.*;
+import javax.annotation.Nullable;
 import kalang.core.*;
 public abstract class VarObject extends AstNode{
     
@@ -17,12 +18,14 @@ public abstract class VarObject extends AstNode{
     }
     
     
-    public VarObject(int modifier,Type type,String name,ExprNode initExpr){
+    public VarObject(int modifier,Type type,String name,@Nullable ExprNode initExpr){
             this.modifier = modifier;
             this.type = type;
             this.name = name;
             this.initExpr = initExpr;
-            addChild(initExpr);
+            if(initExpr!=null){
+                addChild(initExpr);
+            }
     }
     
     public Type getType(){
