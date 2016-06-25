@@ -17,12 +17,12 @@ public class ClassType extends ObjectType {
     
     protected ClassType(ClassNode clazz,Type[] typeArguments,NullableKind nullable ) {
         super(clazz,nullable);
-        this.typeArguments = typeArguments;
+        this.typeArguments = typeArguments==null ? new Type[0] : typeArguments;
         //TODO check typeArguments.length
     }
 
     public Type[] getTypeArguments() {
-        return typeArguments.length>0?typeArguments:clazz.getGenericTypes();
+        return typeArguments;
     }
     
     public Map<GenericType,Type> getTypeArgumentsMap(){
@@ -137,7 +137,6 @@ public class ClassType extends ObjectType {
         if(super.isAssignedFrom(type)) return true;
         //handle parameterizedType
         Type[] typeArgs = getTypeArguments();
-        if(typeArgs.length==0) return false;
         Type[] otherTypeArgs = other.getTypeArguments();
         if(typeArgs.length==otherTypeArgs.length){
             for(int i=0;i<typeArgs.length;i++){
@@ -151,7 +150,7 @@ public class ClassType extends ObjectType {
             }
             return true;
         }
-        return false;
+        return otherTypeArgs.length==0;
     }
 
     @Override

@@ -119,7 +119,7 @@ classType:
         (nullable='?')?
 ;
 parameterizedElementType:
-    Identifier | wildcardType
+    classType | wildcardType
 ;
 wildcardType:
     '?' boundKind=('extends'|'super') classType

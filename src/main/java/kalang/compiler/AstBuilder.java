@@ -457,10 +457,7 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
                     if(typeArguments[i]==null) return null;
                 }
             }else{
-                for(int i=0;i<typeArguments.length;i++){
-                    //TODO here should get bounded type,not root type
-                    typeArguments[i] = Types.getRootType();
-                }
+                typeArguments = new Type[0];
             }
             return Types.getClassType(clazzType.getClassNode(), typeArguments,nullable);
         }else{
@@ -1877,12 +1874,8 @@ public class AstBuilder extends AbstractParseTreeVisitor implements KalangVisito
     }
     
     private Type parseParameterizedElementType(KalangParser.ParameterizedElementTypeContext ctx){
-        if(ctx.Identifier()!=null){
-            String id = ctx.Identifier().getText();
-            if(declarededGenericTypes.containsKey(id)){
-                return declarededGenericTypes.get(id);
-            }
-            return requireClassType(ctx.Identifier().getSymbol());
+        if(ctx.classType()!=null){
+            return parseClassType(ctx.classType());
         }else{
             return parseWildcardType(ctx.wildcardType());
         }
