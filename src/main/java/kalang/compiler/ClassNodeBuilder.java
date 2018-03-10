@@ -2,31 +2,10 @@ package kalang.compiler;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import kalang.antlr.KalangParser;
 import kalang.antlr.KalangParserBaseVisitor;
-import kalang.ast.AssignExpr;
-import kalang.ast.AssignableExpr;
-import kalang.ast.BlockStmt;
 import kalang.ast.ClassNode;
-import kalang.ast.ExprNode;
-import kalang.ast.ExprStmt;
-import kalang.ast.FieldNode;
-import kalang.ast.MethodNode;
-import kalang.ast.ParameterExpr;
-import kalang.ast.ParameterNode;
-import kalang.ast.Statement;
-import kalang.ast.ThisExpr;
-import kalang.core.GenericType;
-import kalang.core.ModifierConstant;
-import kalang.core.NullableKind;
-import kalang.core.ObjectType;
-import kalang.core.Types;
-import kalang.exception.Exceptions;
-import kalang.util.AstUtil;
-import kalang.util.ModifierUtil;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
@@ -41,8 +20,6 @@ public class ClassNodeBuilder extends KalangParserBaseVisitor<Object> {
     private ClassNode thisClazz;
     
     private Map<ClassNode,ParserRuleContext> defContext = new HashMap();
-
-    private boolean inScriptMode = false;
     
     private boolean isScript = false;
 
@@ -63,7 +40,6 @@ public class ClassNodeBuilder extends KalangParserBaseVisitor<Object> {
     @Override
     public Object visitScriptDef(KalangParser.ScriptDefContext ctx) {
         this.isScript = true;
-        this.inScriptMode = true;
         //FIXME fix fileName
         //thisClazz.fileName = this.compilationUnit.getSource().getFileName();
         String className = astBuilder.getClassName();
@@ -79,9 +55,6 @@ public class ClassNodeBuilder extends KalangParserBaseVisitor<Object> {
         ClassNode oldClass = thisClazz;
         Token nameIdentifier = ctx.name;
         int modifier = astBuilder.parseModifier(ctx.varModifier());
-        if (inScriptMode) {
-            modifier |= Modifier.STATIC;
-        }
         Token classKind = ctx.classKind;
         boolean isInterface = false;
         if (classKind != null) {
@@ -111,10 +84,7 @@ public class ClassNodeBuilder extends KalangParserBaseVisitor<Object> {
         }
         //FIXME fix file name
         //thisClazz.fileName = this.compilationUnit.getSource().getFileName();
-        boolean oldScriptMode = this.inScriptMode;
-        this.inScriptMode = false;
         visit(ctx.classBody());
-        this.inScriptMode = oldScriptMode;
         astBuilder.mapAst(thisClazz, ctx);
         thisClazz = oldClass;
         return null;
