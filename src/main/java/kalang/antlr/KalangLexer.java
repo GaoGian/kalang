@@ -1,4 +1,4 @@
-// Generated from KalangLexer.g4 by ANTLR 4.5.1
+// Generated from KalangLexer.g4 by ANTLR 4.7.1
 package kalang.antlr;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class KalangLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.5.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -37,7 +37,14 @@ public class KalangLexer extends Lexer {
 		Identifier=111, AT=112, ELLIPSIS=113, COMPILE_OPTION_LINE=114, WS=115, 
 		COMMENT=116, LINE_COMMENT=117, PACKAGE_DELIMITER=118, INTERPOLATION_INTERUPT=119, 
 		INTERPOLATION_END=120, INTERPOLATION_STRING=121;
-	public static final int STRING = 1;
+	public static final int
+		COMMENTS=2, WHITESPACE=3;
+	public static final int
+		STRING=1;
+	public static String[] channelNames = {
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN", "COMMENTS", "WHITESPACE"
+	};
+
 	public static String[] modeNames = {
 		"DEFAULT_MODE", "STRING"
 	};
@@ -146,8 +153,8 @@ public class KalangLexer extends Lexer {
 	}
 
 
-	    public static final int WHITESPACE = 3;
-	    public static final int COMMENTS =    4; 
+	    //public static final int WHITESPACE = 3;
+	    //public static final int COMMENTS =    4; 
 	    private boolean inString = false;
 
 
@@ -166,6 +173,9 @@ public class KalangLexer extends Lexer {
 	public String getSerializedATN() { return _serializedATN; }
 
 	@Override
+	public String[] getChannelNames() { return channelNames; }
+
+	@Override
 	public String[] getModeNames() { return modeNames; }
 
 	@Override
@@ -179,15 +189,6 @@ public class KalangLexer extends Lexer {
 			break;
 		case 151:
 			InterpolationPreffixString_action((RuleContext)_localctx, actionIndex);
-			break;
-		case 158:
-			WS_action((RuleContext)_localctx, actionIndex);
-			break;
-		case 159:
-			COMMENT_action((RuleContext)_localctx, actionIndex);
-			break;
-		case 160:
-			LINE_COMMENT_action((RuleContext)_localctx, actionIndex);
 			break;
 		case 163:
 			INTERPOLATION_END_action((RuleContext)_localctx, actionIndex);
@@ -209,27 +210,6 @@ public class KalangLexer extends Lexer {
 
 			            inString = true;
 			        
-			break;
-		}
-	}
-	private void WS_action(RuleContext _localctx, int actionIndex) {
-		switch (actionIndex) {
-		case 3:
-			_channel = WHITESPACE;
-			break;
-		}
-	}
-	private void COMMENT_action(RuleContext _localctx, int actionIndex) {
-		switch (actionIndex) {
-		case 4:
-			_channel = COMMENTS;
-			break;
-		}
-	}
-	private void LINE_COMMENT_action(RuleContext _localctx, int actionIndex) {
-		switch (actionIndex) {
-		case 5:
-			_channel = COMMENTS;
 			break;
 		}
 	}
@@ -273,7 +253,7 @@ public class KalangLexer extends Lexer {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\2{\u04c3\b\1\b\1\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2{\u04c3\b\1\b\1\4"+
 		"\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n"+
 		"\4\13\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22"+
 		"\t\22\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31"+
@@ -373,22 +353,22 @@ public class KalangLexer extends Lexer {
 		"i\u0126j\u0128k\u012al\u012cm\u012en\u0130o\u0132p\u0134q\u0136\2\u0138"+
 		"\2\u013ar\u013cs\u013et\u0140u\u0142v\u0144w\u0146x\u0148y\u014az\u014c"+
 		"{\4\2\3\33\4\2NNnn\3\2\63;\4\2ZZzz\5\2\62;CHch\3\2\629\4\2DDdd\3\2\62"+
-		"\63\4\2GGgg\4\2--//\6\2FFHHffhh\4\2RRrr\4\2))^^\5\2$$&&^^\4\2^^}}\3\2"+
-		"))\n\2$$))^^ddhhppttvv\3\2\62\65\6\2&&C\\aac|\4\2\2\u0101\ud802\udc01"+
-		"\3\2\ud802\udc01\3\2\udc02\ue001\7\2&&\62;C\\aac|\4\2\f\f\17\17\5\2\13"+
-		"\f\16\17\"\"\6\2$$&&^^}}\u04d8\2\4\3\2\2\2\2\6\3\2\2\2\2\b\3\2\2\2\2\n"+
-		"\3\2\2\2\2\f\3\2\2\2\2\16\3\2\2\2\2\20\3\2\2\2\2\22\3\2\2\2\2\24\3\2\2"+
-		"\2\2\26\3\2\2\2\2\30\3\2\2\2\2\32\3\2\2\2\2\34\3\2\2\2\2\36\3\2\2\2\2"+
-		" \3\2\2\2\2\"\3\2\2\2\2$\3\2\2\2\2&\3\2\2\2\2(\3\2\2\2\2*\3\2\2\2\2,\3"+
-		"\2\2\2\2.\3\2\2\2\2\60\3\2\2\2\2\62\3\2\2\2\2\64\3\2\2\2\2\66\3\2\2\2"+
-		"\28\3\2\2\2\2:\3\2\2\2\2<\3\2\2\2\2>\3\2\2\2\2@\3\2\2\2\2B\3\2\2\2\2D"+
-		"\3\2\2\2\2F\3\2\2\2\2H\3\2\2\2\2J\3\2\2\2\2L\3\2\2\2\2N\3\2\2\2\2P\3\2"+
-		"\2\2\2R\3\2\2\2\2T\3\2\2\2\2V\3\2\2\2\2X\3\2\2\2\2Z\3\2\2\2\2\\\3\2\2"+
-		"\2\2^\3\2\2\2\2`\3\2\2\2\2b\3\2\2\2\2d\3\2\2\2\2f\3\2\2\2\2h\3\2\2\2\2"+
-		"j\3\2\2\2\2l\3\2\2\2\2n\3\2\2\2\2p\3\2\2\2\2r\3\2\2\2\2t\3\2\2\2\2v\3"+
-		"\2\2\2\2x\3\2\2\2\2z\3\2\2\2\2\u00aa\3\2\2\2\2\u00c0\3\2\2\2\2\u00c2\3"+
-		"\2\2\2\2\u00c6\3\2\2\2\2\u00c8\3\2\2\2\2\u00da\3\2\2\2\2\u00dc\3\2\2\2"+
-		"\2\u00de\3\2\2\2\2\u00e0\3\2\2\2\2\u00e2\3\2\2\2\2\u00e4\3\2\2\2\2\u00e6"+
+		"\63\4\2GGgg\4\2--//\6\2FFHHffhh\4\2RRrr\4\2))^^\5\2$$&&^^\3\2}}\3\2))"+
+		"\n\2$$))^^ddhhppttvv\3\2\62\65\6\2&&C\\aac|\4\2\2\u0101\ud802\udc01\3"+
+		"\2\ud802\udc01\3\2\udc02\ue001\7\2&&\62;C\\aac|\4\2\f\f\17\17\5\2\13\f"+
+		"\16\17\"\"\5\2$$&&}}\2\u04d8\2\4\3\2\2\2\2\6\3\2\2\2\2\b\3\2\2\2\2\n\3"+
+		"\2\2\2\2\f\3\2\2\2\2\16\3\2\2\2\2\20\3\2\2\2\2\22\3\2\2\2\2\24\3\2\2\2"+
+		"\2\26\3\2\2\2\2\30\3\2\2\2\2\32\3\2\2\2\2\34\3\2\2\2\2\36\3\2\2\2\2 \3"+
+		"\2\2\2\2\"\3\2\2\2\2$\3\2\2\2\2&\3\2\2\2\2(\3\2\2\2\2*\3\2\2\2\2,\3\2"+
+		"\2\2\2.\3\2\2\2\2\60\3\2\2\2\2\62\3\2\2\2\2\64\3\2\2\2\2\66\3\2\2\2\2"+
+		"8\3\2\2\2\2:\3\2\2\2\2<\3\2\2\2\2>\3\2\2\2\2@\3\2\2\2\2B\3\2\2\2\2D\3"+
+		"\2\2\2\2F\3\2\2\2\2H\3\2\2\2\2J\3\2\2\2\2L\3\2\2\2\2N\3\2\2\2\2P\3\2\2"+
+		"\2\2R\3\2\2\2\2T\3\2\2\2\2V\3\2\2\2\2X\3\2\2\2\2Z\3\2\2\2\2\\\3\2\2\2"+
+		"\2^\3\2\2\2\2`\3\2\2\2\2b\3\2\2\2\2d\3\2\2\2\2f\3\2\2\2\2h\3\2\2\2\2j"+
+		"\3\2\2\2\2l\3\2\2\2\2n\3\2\2\2\2p\3\2\2\2\2r\3\2\2\2\2t\3\2\2\2\2v\3\2"+
+		"\2\2\2x\3\2\2\2\2z\3\2\2\2\2\u00aa\3\2\2\2\2\u00c0\3\2\2\2\2\u00c2\3\2"+
+		"\2\2\2\u00c6\3\2\2\2\2\u00c8\3\2\2\2\2\u00da\3\2\2\2\2\u00dc\3\2\2\2\2"+
+		"\u00de\3\2\2\2\2\u00e0\3\2\2\2\2\u00e2\3\2\2\2\2\u00e4\3\2\2\2\2\u00e6"+
 		"\3\2\2\2\2\u00e8\3\2\2\2\2\u00ea\3\2\2\2\2\u00ec\3\2\2\2\2\u00ee\3\2\2"+
 		"\2\2\u00f0\3\2\2\2\2\u00f2\3\2\2\2\2\u00f4\3\2\2\2\2\u00f6\3\2\2\2\2\u00f8"+
 		"\3\2\2\2\2\u00fa\3\2\2\2\2\u00fc\3\2\2\2\2\u00fe\3\2\2\2\2\u0100\3\2\2"+
@@ -700,9 +680,9 @@ public class KalangLexer extends Lexer {
 		"\u04a6\7\61\2\2\u04a6\u04a7\7\61\2\2\u04a7\u04ab\3\2\2\2\u04a8\u04aa\n"+
 		"\30\2\2\u04a9\u04a8\3\2\2\2\u04aa\u04ad\3\2\2\2\u04ab\u04a9\3\2\2\2\u04ab"+
 		"\u04ac\3\2\2\2\u04ac\u04ae\3\2\2\2\u04ad\u04ab\3\2\2\2\u04ae\u04af\b\u00a2"+
-		"\6\2\u04af\u0145\3\2\2\2\u04b0\u04b1\7^\2\2\u04b1\u0147\3\2\2\2\u04b2"+
+		"\5\2\u04af\u0145\3\2\2\2\u04b0\u04b1\7^\2\2\u04b1\u0147\3\2\2\2\u04b2"+
 		"\u04b3\7&\2\2\u04b3\u04b4\7}\2\2\u04b4\u04b5\3\2\2\2\u04b5\u04b6\b\u00a4"+
-		"\7\2\u04b6\u0149\3\2\2\2\u04b7\u04b8\7$\2\2\u04b8\u04b9\b\u00a5\b\2\u04b9"+
+		"\6\2\u04b6\u0149\3\2\2\2\u04b7\u04b8\7$\2\2\u04b8\u04b9\b\u00a5\7\2\u04b9"+
 		"\u014b\3\2\2\2\u04ba\u04bc\n\32\2\2\u04bb\u04ba\3\2\2\2\u04bc\u04bd\3"+
 		"\2\2\2\u04bd\u04bb\3\2\2\2\u04bd\u04be\3\2\2\2\u04be\u04c2\3\2\2\2\u04bf"+
 		"\u04c0\7&\2\2\u04c0\u04c2\n\17\2\2\u04c1\u04bb\3\2\2\2\u04c1\u04bf\3\2"+
@@ -711,7 +691,7 @@ public class KalangLexer extends Lexer {
 		"\u0337\u0341\u0345\u034b\u034f\u0354\u0357\u035a\u035f\u0362\u0367\u036c"+
 		"\u0374\u037f\u0383\u0388\u038c\u039c\u03a6\u03ac\u03b5\u03be\u03c3\u03c9"+
 		"\u03d3\u03d9\u03e6\u0466\u0471\u047a\u0482\u048e\u0493\u049d\u04ab\u04bd"+
-		"\u04c1\t\3q\2\3\u0099\3\3\u00a0\5\3\u00a1\6\3\u00a2\7\6\2\2\3\u00a5\4";
+		"\u04c1\b\3q\2\3\u0099\3\2\5\2\2\4\2\6\2\2\3\u00a5\4";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
